@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func GetWebhookInfoFunc(config TGApiConfig) (string, error) {
+func GetWebhookInfo(config TGApiConfig) (string, error) {
 
 	bot, err := newBotWithConfig(config)
 	if err != nil {
@@ -16,9 +16,7 @@ func GetWebhookInfoFunc(config TGApiConfig) (string, error) {
 	return jsonIdent(webhookInfo, err)
 }
 
-
-
-func SetWebhookInfoFunc(config TGApiConfig, request SetWebhookConfig) (string, error) {
+func SetWebhookInfo(config TGApiConfig, request SetWebhookConfig) (string, error) {
 
 	bot, err := newBotWithConfig(config)
 	if err != nil {
@@ -29,7 +27,7 @@ func SetWebhookInfoFunc(config TGApiConfig, request SetWebhookConfig) (string, e
 	return jsonIdent(resp, err)
 }
 
-func DeleteWebhookFunc(config TGApiConfig, request DeleteWebhookConfig) (string, error) {
+func DeleteWebhook(config TGApiConfig, request DeleteWebhookConfig) (string, error) {
 
 	bot, err := newBotWithConfig(config)
 	if err != nil {
@@ -41,7 +39,7 @@ func DeleteWebhookFunc(config TGApiConfig, request DeleteWebhookConfig) (string,
 }
 
 func jsonIdent(result interface{}, err error) (string, error) {
-	
+
 	if err != nil {
 		return "", fmt.Errorf("error to get result info: %v", err)
 	}

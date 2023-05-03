@@ -10,7 +10,7 @@ import (
 var bot *tgbotapi.BotAPI
 var err error
 
-func RunTGBotPollingModeFunc(config TGApiConfig) {
+func RunTGBotPollingMode(config TGApiConfig) {
 
 	bot, err = tgbotapi.NewBotAPIWithClient(config.Token, config.URL, &config.HttpClient)
 	if err != nil {

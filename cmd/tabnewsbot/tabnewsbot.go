@@ -31,9 +31,9 @@ var telegramBotCmd = &cobra.Command{
 		}
 
 		if isLambdaMode {
-			telegram.RunTGBotLambdaModeFunc(config)
+			telegram.RunTGBotLambdaMode(config)
 		} else {
-			telegram.RunTGBotPollingModeFunc(config)
+			telegram.RunTGBotPollingMode(config)
 		}
 	},
 }

@@ -30,7 +30,7 @@ var getWebhookInfoCmd = &cobra.Command{
 			HttpClient: httpClient,
 		}
 
-		result, err := GetWebhookInfoFunc(config)
+		result, err := GetWebhookInfo(config)
 		if err != nil {
 			finalizeWithError(err)
 		}
@@ -52,7 +52,7 @@ var setWebhookCmd = &cobra.Command{
 			HttpClient: httpClient,
 		}
 
-		result, err := SetWebhookInfoFunc(config, setWebhookConfig)
+		result, err := SetWebhookInfo(config, setWebhookConfig)
 		if err != nil {
 			finalizeWithError(err)
 		}
@@ -74,7 +74,7 @@ var deleteWebhookCmd = &cobra.Command{
 			HttpClient: httpClient,
 		}
 
-		result, err := DeleteWebhookFunc(config, deleteWebhookConfig)
+		result, err := DeleteWebhook(config, deleteWebhookConfig)
 		if err != nil {
 			finalizeWithError(err)
 		}

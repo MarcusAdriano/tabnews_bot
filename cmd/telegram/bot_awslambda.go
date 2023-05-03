@@ -4,6 +4,6 @@ import (
 	"fmt"
 )
 
-func RunTGBotLambdaModeFunc(config TGApiConfig) {
+func RunTGBotLambdaMode(config TGApiConfig) {
 	fmt.Println("not implemented yet")
 }
