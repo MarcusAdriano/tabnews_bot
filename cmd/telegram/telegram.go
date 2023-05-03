@@ -1,7 +1,6 @@
 package telegram
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,7 +30,7 @@ var getWebhookInfoCmd = &cobra.Command{
 			HttpClient: httpClient,
 		}
 
-		result, err := getWebhookInfo(config)
+		result, err := GetWebhookInfoFunc(config)
 		if err != nil {
 			finalizeWithError(err)
 		}
@@ -53,7 +52,7 @@ var setWebhookCmd = &cobra.Command{
 			HttpClient: httpClient,
 		}
 
-		result, err := setWebhookInfo(config, setWebhookConfig)
+		result, err := SetWebhookInfoFunc(config, setWebhookConfig)
 		if err != nil {
 			finalizeWithError(err)
 		}
@@ -81,38 +80,6 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		finalizeWithError(err)
 	}
-}
-
-func getWebhookInfo(config TGApiConfig) (string, error) {
-
-	bot, err := newBotWithConfig(config)
-	if err != nil {
-		return "", fmt.Errorf("error to create bot: %v", err)
-	}
-
-	webhookInfo, err := bot.GetWebhookInfo()
-	if err != nil {
-		return "", fmt.Errorf("error to get webhook info: %v", err)
-	}
-
-	webhookJson, _ := json.MarshalIndent(webhookInfo, "", "  ")
-	return fmt.Sprintf("%s\n", webhookJson), nil
-}
-
-func setWebhookInfo(config TGApiConfig, request SetWebhookConfig) (string, error) {
-
-	bot, err := newBotWithConfig(config)
-	if err != nil {
-		return "", fmt.Errorf("error to create bot: %v", err)
-	}
-
-	resp, err := bot.MakeRequest(request.Method(), request.Params())
-	if err != nil {
-		return "", fmt.Errorf("error to set webhook: %v", err)
-	}
-
-	webhookJson, _ := json.MarshalIndent(resp, "", "  ")
-	return fmt.Sprintf("%s\n", webhookJson), nil
 }
 
 func newBotWithConfig(config TGApiConfig) (*tgbotapi.BotAPI, error) {
