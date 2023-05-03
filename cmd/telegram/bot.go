@@ -41,11 +41,9 @@ func RunBotPollingModeFunc(config TGApiConfig) {
 	}
 }
 
-func sender(messages []tgbotapi.MessageConfig) {
-	for _, msg := range messages {
-		_, err := bot.Send(msg)
-		if err != nil {
-			log.Printf("Cannot send message %v, error: %v\n", msg, err)
-		}
+func sender(msg tgbotapi.Chattable) {
+	_, err := bot.Send(msg)
+	if err != nil {
+		log.Printf("Cannot send message %v, error: %v\n", msg, err)
 	}
 }

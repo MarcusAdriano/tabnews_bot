@@ -2,8 +2,8 @@ package tabnewsapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -39,7 +39,7 @@ func (t tabNewsAPI) Contents(config ContentsConfig) ([]Content, error) {
 	params := createUrlParams(config)
 	tabNewsUrl := buildUrlWithParams(urlBase, params)
 
-	fmt.Println("Calling TabNews API with URL:", tabNewsUrl)
+	log.Printf("Calling TabNews API with URL: %s", tabNewsUrl)
 
 	req, err := http.NewRequest(method, tabNewsUrl, nil)
 	req.Header.Set("user-agent", "Telegram BOT (tabnews_bot; v0.1) ")
