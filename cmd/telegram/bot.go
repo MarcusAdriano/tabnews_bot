@@ -5,12 +5,15 @@ import (
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/marcusadriano/tabnews_bot/pkg/telegram"
+	"github.com/marcusadriano/tabnews_bot/internal/telegram"
 )
+
+var bot *tgbotapi.BotAPI
+var err error
 
 func RunBotPollingModeFunc(config TGApiConfig) {
 
-	bot, err := tgbotapi.NewBotAPIWithClient(config.Token, config.URL, &config.HttpClient)
+	bot, err = tgbotapi.NewBotAPIWithClient(config.Token, config.URL, &config.HttpClient)
 	if err != nil {
 		log.Panic(err)
 		os.Exit(1)
@@ -27,9 +30,20 @@ func RunBotPollingModeFunc(config TGApiConfig) {
 
 	for update := range updates {
 		if update.Message != nil {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			go telegram.ReceiveMessage(update)
+			message := telegram.TabNewsTgBotUpdate{
+				Update: update,
+				Sender: sender,
+			}
+
+			go telegram.ReceiveMessage(message)
 		}
+	}
+}
+
+func sender(msg tgbotapi.Chattable) {
+	_, err := bot.Send(msg)
+	if err != nil {
+		log.Printf("Cannot send message %v, error: %v\n", msg, err)
 	}
 }
