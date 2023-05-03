@@ -13,13 +13,10 @@ func GetWebhookInfoFunc(config TGApiConfig) (string, error) {
 	}
 
 	webhookInfo, err := bot.GetWebhookInfo()
-	if err != nil {
-		return "", fmt.Errorf("error to get webhook info: %v", err)
-	}
-
-	webhookJson, _ := json.MarshalIndent(webhookInfo, "", "  ")
-	return fmt.Sprintf("%s\n", webhookJson), nil
+	return jsonIdent(webhookInfo, err)
 }
+
+
 
 func SetWebhookInfoFunc(config TGApiConfig, request SetWebhookConfig) (string, error) {
 
@@ -29,10 +26,26 @@ func SetWebhookInfoFunc(config TGApiConfig, request SetWebhookConfig) (string, e
 	}
 
 	resp, err := bot.MakeRequest(request.Method(), request.Params())
+	return jsonIdent(resp, err)
+}
+
+func DeleteWebhookFunc(config TGApiConfig, request DeleteWebhookConfig) (string, error) {
+
+	bot, err := newBotWithConfig(config)
 	if err != nil {
-		return "", fmt.Errorf("error to set webhook: %v", err)
+		return "", fmt.Errorf("error to create bot: %v", err)
 	}
 
-	webhookJson, _ := json.MarshalIndent(resp, "", "  ")
+	resp, err := bot.MakeRequest(request.Method(), request.Params())
+	return jsonIdent(resp, err)
+}
+
+func jsonIdent(result interface{}, err error) (string, error) {
+	
+	if err != nil {
+		return "", fmt.Errorf("error to get result info: %v", err)
+	}
+
+	webhookJson, _ := json.MarshalIndent(result, "", "  ")
 	return fmt.Sprintf("%s\n", webhookJson), nil
 }

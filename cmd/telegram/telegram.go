@@ -61,6 +61,28 @@ var setWebhookCmd = &cobra.Command{
 	},
 }
 
+var deleteWebhookConfig DeleteWebhookConfig
+
+var deleteWebhookCmd = &cobra.Command{
+	Use:   "delete",
+	Short: "Delete webhook details",
+	Run: func(cmd *cobra.Command, args []string) {
+
+		config := TGApiConfig{
+			URL:        telegramApiUrl,
+			Token:      token,
+			HttpClient: httpClient,
+		}
+
+		result, err := DeleteWebhookFunc(config, deleteWebhookConfig)
+		if err != nil {
+			finalizeWithError(err)
+		}
+
+		fmt.Println(result)
+	},
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "telegram",
 	Short: "Manage telegram webhook details",
@@ -94,11 +116,13 @@ func initialize() {
 	setWebhookCmd.PersistentFlags().StringVarP(&setWebhookConfig.URL, "webhook", "w", "", "Webhook URL")
 	setWebhookCmd.PersistentFlags().IntVarP(&setWebhookConfig.MaxConnections, "max_connections", "m", 40, "Max connections")
 	setWebhookCmd.PersistentFlags().StringArrayVarP(&setWebhookConfig.AllowedUpdates, "allowed_updates", "a", []string{}, "Allowed updates")
-	setWebhookCmd.PersistentFlags().BoolVarP(&setWebhookConfig.DropPendingUpdates, "drop_pending_updates", "d", false, "Drop pending updates")
+	setWebhookCmd.Flags().BoolVarP(&setWebhookConfig.DropPendingUpdates, "drop_pending_updates", "d", false, "Drop pending updates")
 	setWebhookCmd.PersistentFlags().StringVarP(&setWebhookConfig.SecretToken, "secret_token", "s", "", "Secret token")
 	setWebhookCmd.MarkPersistentFlagRequired("webhook")
 
-	webhookCmd.AddCommand(getWebhookInfoCmd, setWebhookCmd)
+	deleteWebhookCmd.Flags().BoolVarP(&deleteWebhookConfig.DropPendingUpdates, "drop_pending_updates", "d", false, "Drop pending updates")
+
+	webhookCmd.AddCommand(getWebhookInfoCmd, setWebhookCmd, deleteWebhookCmd)
 
 	rootCmd.AddCommand(webhookCmd)
 }

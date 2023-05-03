@@ -12,6 +12,22 @@ type TGApiConfig struct {
 	HttpClient http.Client
 }
 
+type DeleteWebhookConfig struct {
+	DropPendingUpdates bool `json:"drop_pending_updates,omitempty"`
+}
+
+func (d DeleteWebhookConfig) Params() tgbotapi.Params {
+	params := make(tgbotapi.Params)
+
+	params.AddBool("drop_pending_updates", d.DropPendingUpdates)
+
+	return params
+}
+
+func (d DeleteWebhookConfig) Method() string {
+	return "deleteWebhook"
+}
+
 type SetWebhookConfig struct {
 	URL                string   `json:"url"`
 	Certificate        string   `json:"certificate,omitempty"`
