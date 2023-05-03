@@ -2,7 +2,6 @@ package telegram
 
 import (
 	"log"
-	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/marcusadriano/tabnews_bot/internal/telegram"
@@ -11,12 +10,11 @@ import (
 var bot *tgbotapi.BotAPI
 var err error
 
-func RunBotPollingModeFunc(config TGApiConfig) {
+func RunTGBotPollingMode(config TGApiConfig) {
 
 	bot, err = tgbotapi.NewBotAPIWithClient(config.Token, config.URL, &config.HttpClient)
 	if err != nil {
-		log.Panic(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	bot.Debug = true

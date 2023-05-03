@@ -1,7 +1,7 @@
 package telegram
 
 import (
-	"fmt"
+	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/marcusadriano/tabnews_bot/internal/tabnewsapi"
@@ -90,7 +90,7 @@ func newInlineButtonResponse(message TabNewsTgBotUpdate, config tabnewsapi.Conte
 	update := message.Update
 	contents, err := tabNewsApi.Contents(config)
 	if err != nil {
-		fmt.Println("Error calling TabNews API:", err)
+		log.Fatalf("Error calling TabNews API: %v\n", err)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Desculpe, não consegui acessar o TabNews agora :(")
 		message.Sender(msg)

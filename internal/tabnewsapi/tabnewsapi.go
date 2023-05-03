@@ -39,7 +39,7 @@ func (t tabNewsAPI) Contents(config ContentsConfig) ([]Content, error) {
 	params := createUrlParams(config)
 	tabNewsUrl := buildUrlWithParams(urlBase, params)
 
-	log.Printf("Calling TabNews API with URL: %s", tabNewsUrl)
+	log.Printf("Calling TabNews API with URL: %s\n", tabNewsUrl)
 
 	req, err := http.NewRequest(method, tabNewsUrl, nil)
 	req.Header.Set("user-agent", "Telegram BOT (tabnews_bot; v0.1) ")
