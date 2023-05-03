@@ -83,28 +83,6 @@ var deleteWebhookCmd = &cobra.Command{
 	},
 }
 
-var isModeLambda = false
-var runnerCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run telegram bot",
-	Run: func(cmd *cobra.Command, args []string) {
-
-		token := os.Getenv("TELEGRAM_BOT_TOKEN")
-		url := os.Getenv("TELEGRAM_API_URL")
-		if len(url) == 0 {
-			url = tgbotapi.APIEndpoint
-		}
-
-		config := TGApiConfig{
-			URL:        url,
-			Token:      token,
-			HttpClient: httpClient,
-		}
-
-		RunBotPollingModeFunc(config)
-	},
-}
-
 var rootCmd = &cobra.Command{
 	Use:   "telegram",
 	Short: "Manage telegram webhook details",
@@ -112,9 +90,6 @@ var rootCmd = &cobra.Command{
 		DisableDefaultCmd: true,
 	},
 	Version: "1.0",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("telegram called")
-	},
 }
 
 func Execute() {
@@ -142,13 +117,11 @@ func initialize() {
 	setWebhookCmd.PersistentFlags().StringVarP(&setWebhookConfig.SecretToken, "secret_token", "s", "", "Secret token")
 	setWebhookCmd.MarkPersistentFlagRequired("webhook")
 
-	runnerCmd.Flags().BoolVarP(&isModeLambda, "lambda", "l", false, "Run in lambda mode")
-
 	deleteWebhookCmd.Flags().BoolVarP(&deleteWebhookConfig.DropPendingUpdates, "drop_pending_updates", "d", false, "Drop pending updates")
 
 	webhookCmd.AddCommand(getWebhookInfoCmd, setWebhookCmd, deleteWebhookCmd)
 
-	rootCmd.AddCommand(webhookCmd, runnerCmd)
+	rootCmd.AddCommand(webhookCmd)
 }
 
 func finalizeWithError(err error) {
