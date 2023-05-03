@@ -25,18 +25,18 @@ var getWebhookInfoCmd = &cobra.Command{
 	Short: "Get current webhook details",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		bot, err := tgbotapi.NewBotAPIWithClient(token, telegramApiUrl, &httpClient)
-		if err != nil {
-			finalizeWithMessageAndError("Error to create Telegram Bot API client: ", err)
+		config := TGApiConfig{
+			URL:        telegramApiUrl,
+			Token:      token,
+			HttpClient: httpClient,
 		}
 
-		webhookInfo, err := bot.GetWebhookInfo()
+		result, err := getWebhookInfo(config)
 		if err != nil {
-			finalizeWithMessageAndError("Error to get webhook info: ", err)
+			finalizeWithError(err)
 		}
 
-		json, _ := json.Marshal(webhookInfo)
-		fmt.Printf("%s\n", json)
+		fmt.Println(result)
 	},
 }
 
@@ -61,6 +61,22 @@ func Execute() {
 	}
 }
 
+func getWebhookInfo(config TGApiConfig) (string, error) {
+
+	bot, err := tgbotapi.NewBotAPIWithClient(config.Token, config.URL, &config.HttpClient)
+	if err != nil {
+		return "", fmt.Errorf("error to create bot: %v", err)
+	}
+
+	webhookInfo, err := bot.GetWebhookInfo()
+	if err != nil {
+		return "", fmt.Errorf("error to get webhook info: %v", err)
+	}
+
+	webhookJson, _ := json.MarshalIndent(webhookInfo, "", "  ")
+	return fmt.Sprintf("%s\n", webhookJson), nil
+}
+
 func initialize() {
 	webhookCmd.PersistentFlags().StringVarP(&telegramApiUrl, "telegramApiUrl", "u", tgbotapi.APIEndpoint, "Telegram API URL")
 	webhookCmd.PersistentFlags().StringVarP(&token, "token", "t", "", "Telegram bot token")
@@ -73,10 +89,5 @@ func initialize() {
 
 func finalizeWithError(err error) {
 	fmt.Println(err)
-	os.Exit(1)
-}
-
-func finalizeWithMessageAndError(message string, err error) {
-	fmt.Println(message, err)
 	os.Exit(1)
 }
