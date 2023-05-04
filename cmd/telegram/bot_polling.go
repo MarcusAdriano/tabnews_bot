@@ -7,9 +7,6 @@ import (
 	"github.com/marcusadriano/tabnews_bot/internal/telegram"
 )
 
-var bot *tgbotapi.BotAPI
-var err error
-
 func RunTGBotPollingMode(config TGApiConfig) {
 
 	bot, err = tgbotapi.NewBotAPIWithClient(config.Token, config.URL, &config.HttpClient)
@@ -17,7 +14,7 @@ func RunTGBotPollingMode(config TGApiConfig) {
 		log.Fatal(err)
 	}
 
-	bot.Debug = true
+	bot.Debug = false
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -36,12 +33,5 @@ func RunTGBotPollingMode(config TGApiConfig) {
 
 			go telegram.ReceiveMessage(message)
 		}
-	}
-}
-
-func sender(msg tgbotapi.Chattable) {
-	_, err := bot.Send(msg)
-	if err != nil {
-		log.Printf("Cannot send message %v, error: %v\n", msg, err)
 	}
 }

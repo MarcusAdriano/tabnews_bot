@@ -15,6 +15,12 @@ const (
 )
 
 const (
+	CmdNovos      = "novos"
+	CmdAntigos    = "antigos"
+	CmdRelevantes = "relevantes"
+)
+
+const (
 	fire = `🔥`
 	new  = `🆕`
 	old  = `👴`
@@ -46,11 +52,11 @@ func handleCommand(message TabNewsTgBotUpdate) {
 	switch update.Message.Command() {
 	case "start":
 		handleStartCmd(message)
-	case "relevant":
+	case CmdRelevantes:
 		handleRelevantCmd(message)
-	case "old":
+	case CmdAntigos:
 		handleOldCmd(message)
-	case "new":
+	case CmdNovos:
 		handleNewCmd(message)
 	default:
 		handleUnknownCmd(message)
@@ -125,7 +131,7 @@ func newInlineButtonResponse(message TabNewsTgBotUpdate, label string, config ta
 
 func handleHelp(message TabNewsTgBotUpdate) {
 	update := message.Update
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Utilize um dos comandos abaixo.\n\nComandos:\n/relevant - Notícias mais relevantes\n/old - Notícias mais antigas\n/new - Notícias mais recentes")
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Utilize um dos comandos abaixo.\n\nComandos:\n/relevantes - Notícias mais relevantes\n/antigos - Notícias mais antigas\n/novos - Notícias mais recentes")
 
 	message.Sender(msg)
 }
