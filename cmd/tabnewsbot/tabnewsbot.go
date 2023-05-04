@@ -10,32 +10,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var isLambdaMode = false
+func startTelegramBot(cmd *cobra.Command, args []string) {
+
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+	url := os.Getenv("TELEGRAM_API_URL")
+	if len(url) == 0 {
+		url = tgbotapi.APIEndpoint
+	}
+
+	httpClient := http.Client{}
+
+	config := telegram.TGApiConfig{
+		URL:        url,
+		Token:      token,
+		HttpClient: httpClient,
+	}
+
+	if isLocalMode {
+		telegram.RunTGBotPollingMode(config)
+	} else {
+		telegram.RunTGBotLambdaMode(config)
+	}
+}
+
+var isLocalMode = false
 var telegramBotCmd = &cobra.Command{
 	Use:   "telegram",
 	Short: "Run telegram bot",
-	Run: func(cmd *cobra.Command, args []string) {
-
-		token := os.Getenv("TELEGRAM_BOT_TOKEN")
-		url := os.Getenv("TELEGRAM_API_URL")
-		if len(url) == 0 {
-			url = tgbotapi.APIEndpoint
-		}
-
-		httpClient := http.Client{}
-
-		config := telegram.TGApiConfig{
-			URL:        url,
-			Token:      token,
-			HttpClient: httpClient,
-		}
-
-		if isLambdaMode {
-			telegram.RunTGBotLambdaMode(config)
-		} else {
-			telegram.RunTGBotPollingMode(config)
-		}
-	},
+	Run:   startTelegramBot,
 }
 
 var rootCmd = &cobra.Command{
@@ -44,11 +46,12 @@ var rootCmd = &cobra.Command{
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	},
+	Run: startTelegramBot,
 }
 
 func initialize() {
-	telegramBotCmd.Flags().BoolVarP(&isLambdaMode, "lambda", "l", false, "Run in lambda mode")
-
+	telegramBotCmd.Flags().BoolVarP(&isLocalMode, "local", "l", false, "Run in local mode")
+	rootCmd.Flags().BoolVarP(&isLocalMode, "local", "l", false, "Run in local mode")
 	rootCmd.AddCommand(telegramBotCmd)
 }
 
