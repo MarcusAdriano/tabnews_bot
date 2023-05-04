@@ -1,20 +1,20 @@
 BINARY_NAME=tabnews_bot
 ZIP_FILE_NAME=tabnews_bot
 
-all: build test
+all: build
 
 build:
-	@go get -v ./...
-	@go build -o bin/$(BINARY_NAME) -v
+	mkdir -p bin
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/$(BINARY_NAME) main.go
 
 zip:
-	@zip -r $(ZIP_FILE_NAME).zip bin/$(BINARY_NAME) config.json
+	zip -r $(ZIP_FILE_NAME).zip bin/$(BINARY_NAME)
 
 publish_lambda:
-	@aws lambda update-function-code --function-name tabnews_bot --zip-file fileb://$(ZIP_FILE_NAME).zip
+	aws lambda update-function-code --function-name tabnews_bot --zip-file fileb://$(ZIP_FILE_NAME).zip
 
 test:
-	@go test -v ./...
+	go test -v ./...
 
 clean:
-	@rm -f bin/$(BINARY_NAME)
+	rm -rf bin
