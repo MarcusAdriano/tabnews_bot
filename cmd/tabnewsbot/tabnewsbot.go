@@ -41,6 +41,9 @@ var telegramBotCmd = &cobra.Command{
 var rootCmd = &cobra.Command{
 	Use:   "tabnewsbot",
 	Short: "Run TabNews chat bot",
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	},
 }
 
 func initialize() {

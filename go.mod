@@ -2,7 +2,7 @@ module github.com/marcusadriano/tabnews_bot
 
 go 1.20
 
-require github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+require github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.2-0.20221020003552-4126fa611266
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
