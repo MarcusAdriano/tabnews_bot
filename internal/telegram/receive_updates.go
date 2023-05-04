@@ -96,8 +96,8 @@ func newInlineButtonResponse(message TabNewsTgBotUpdate, label string, config ta
 
 	update := message.Update
 	contents, err := tabNewsApi.Contents(config)
-	if err != nil {
-		log.Fatalf("Error calling TabNews API: %v\n", err)
+	if err != nil || len(contents) == 0 {
+		log.Printf("Error calling TabNews API: %v\n", err)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Desculpe, não consegui acessar o TabNews agora :(")
 		message.Sender(msg)
