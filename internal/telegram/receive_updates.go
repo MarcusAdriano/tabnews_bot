@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -11,6 +12,12 @@ const (
 	TabNewsBaseApiUrl = "https://www.tabnews.com.br"
 	DefaultPageSize   = 10
 	DefaultPage       = 0
+)
+
+const (
+	fire = `🔥`
+	new  = `🆕`
+	old  = `👴`
 )
 
 var tabNewsApi = tabnewsapi.NewTabNewsAPI(TabNewsBaseApiUrl)
@@ -26,66 +33,66 @@ func ReceiveMessage(message TabNewsTgBotUpdate) {
 
 	update := message.Update.Message
 	if update.IsCommand() {
-		receiveCommand(message)
+		handleCommand(message)
 		return
 	} else {
-		receiveHelp(message)
+		handleHelp(message)
 	}
 }
 
-func receiveCommand(message TabNewsTgBotUpdate) {
+func handleCommand(message TabNewsTgBotUpdate) {
 
 	update := message.Update
 	switch update.Message.Command() {
 	case "start":
-		receiveStart(message)
+		handleStartCmd(message)
 	case "relevant":
-		receiveRelevant(message)
+		handleRelevantCmd(message)
 	case "old":
-		receiveOld(message)
+		handleOldCmd(message)
 	case "new":
-		receiveNews(message)
+		handleNewCmd(message)
 	default:
-		receiveUnknownCommand(message)
+		handleUnknownCmd(message)
 	}
 }
 
-func receiveStart(message TabNewsTgBotUpdate) {
+func handleStartCmd(message TabNewsTgBotUpdate) {
 	update := message.Update
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Olá, seja bem-vindo ao TabNews Bot! Utilize os comandos e seja feliz ;D")
 
 	message.Sender(msg)
 }
 
-func receiveRelevant(message TabNewsTgBotUpdate) {
+func handleRelevantCmd(message TabNewsTgBotUpdate) {
 
 	contentConfig := tabnewsapi.ContentsConfig{
 		Page:     DefaultPage,
 		PerPage:  DefaultPageSize,
 		Strategy: tabnewsapi.StrategyRelevant,
 	}
-	newInlineButtonResponse(message, contentConfig)
+	newInlineButtonResponse(message, fmt.Sprintf("%s Relevantes: %s", fire, fire), contentConfig)
 }
 
-func receiveNews(message TabNewsTgBotUpdate) {
+func handleNewCmd(message TabNewsTgBotUpdate) {
 	contentConfig := tabnewsapi.ContentsConfig{
 		Page:     DefaultPage,
 		PerPage:  DefaultPageSize,
 		Strategy: tabnewsapi.StrategyNew,
 	}
-	newInlineButtonResponse(message, contentConfig)
+	newInlineButtonResponse(message, fmt.Sprintf("%s Novos posts: %s", new, new), contentConfig)
 }
 
-func receiveOld(message TabNewsTgBotUpdate) {
+func handleOldCmd(message TabNewsTgBotUpdate) {
 	contentConfig := tabnewsapi.ContentsConfig{
 		Page:     DefaultPage,
 		PerPage:  DefaultPageSize,
 		Strategy: tabnewsapi.StrategyOld,
 	}
-	newInlineButtonResponse(message, contentConfig)
+	newInlineButtonResponse(message, fmt.Sprintf("%s Posts antigos: %s", old, old), contentConfig)
 }
 
-func newInlineButtonResponse(message TabNewsTgBotUpdate, config tabnewsapi.ContentsConfig) {
+func newInlineButtonResponse(message TabNewsTgBotUpdate, label string, config tabnewsapi.ContentsConfig) {
 
 	update := message.Update
 	contents, err := tabNewsApi.Contents(config)
@@ -101,25 +108,29 @@ func newInlineButtonResponse(message TabNewsTgBotUpdate, config tabnewsapi.Conte
 
 	for _, content := range contents {
 		contentUrl := content.Link(TabNewsBaseApiUrl)
-		button := tgbotapi.NewInlineKeyboardButtonURL(content.Title, contentUrl)
+		webAppInfo := tgbotapi.WebAppInfo{
+			URL: contentUrl,
+		}
+
+		button := tgbotapi.NewInlineKeyboardButtonWebApp(content.Title, webAppInfo)
 		row := tgbotapi.NewInlineKeyboardRow(button)
 		inlineKeyboardRows = append(inlineKeyboardRows, row)
 	}
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Segue o posts:")
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, label)
 	msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(inlineKeyboardRows...)
 
 	message.Sender(msg)
 }
 
-func receiveHelp(message TabNewsTgBotUpdate) {
+func handleHelp(message TabNewsTgBotUpdate) {
 	update := message.Update
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Utilize um dos comandos abaixo.\n\nComandos:\n/relevant - Notícias mais relevantes\n/old - Notícias mais antigas\n/new - Notícias mais recentes")
 
 	message.Sender(msg)
 }
 
-func receiveUnknownCommand(message TabNewsTgBotUpdate) {
+func handleUnknownCmd(message TabNewsTgBotUpdate) {
 	update := message.Update
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Comando desconhecido")
 	msg.ReplyToMessageID = update.Message.MessageID
