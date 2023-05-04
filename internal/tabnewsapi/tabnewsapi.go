@@ -2,10 +2,18 @@ package tabnewsapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"time"
+
+	"github.com/marcusadriano/tabnews_bot/internal/cache"
+)
+
+const (
+	cacheTtl = time.Minute * 10
 )
 
 type TabNewsAPI interface {
@@ -15,19 +23,43 @@ type TabNewsAPI interface {
 type tabNewsAPI struct {
 	baseUrl string
 	client  *http.Client
+	cache   *cache.Cache
 }
 
 func NewTabNewsAPI(baseUrl string) TabNewsAPI {
 
 	client := &http.Client{}
+	inMemoryCache := cache.NewCache()
 
 	return tabNewsAPI{
 		baseUrl: baseUrl,
 		client:  client,
+		cache:   inMemoryCache,
 	}
 }
 
 func (t tabNewsAPI) Contents(config ContentsConfig) ([]Content, error) {
+
+	return t.contentsFromCache(config)
+}
+
+func (t tabNewsAPI) contentsFromCache(config ContentsConfig) ([]Content, error) {
+
+	key := fmt.Sprintf("%s-%d-%d", config.Strategy, config.Page, config.PerPage)
+
+	if v, ok := t.cache.Get(key); ok {
+		log.Printf("Cache hit for key: %s\n", key)
+		return v.([]Content), nil
+	}
+
+	contents, err := t.contentsFromSource(config)
+	if err == nil && len(contents) > 0 {
+		t.cache.Set(key, contents, cacheTtl)
+	}
+	return contents, err
+}
+
+func (t tabNewsAPI) contentsFromSource(config ContentsConfig) ([]Content, error) {
 
 	urlBase, err := url.Parse(t.baseUrl + "/api/v1/contents")
 	if err != nil {
