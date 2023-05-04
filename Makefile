@@ -12,6 +12,12 @@ zip:
 
 aws_lambda: clean build zip
 
+build_tg_cli:
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/telegram_linux script/telegram/main.go
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o bin/telegram_windows.exe script/telegram/main.go
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o bin/telegram_mac script/telegram/main.go
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o bin/telegram_mac_arm script/telegram/main.go
+
 test:
 	go test -v ./...
 
