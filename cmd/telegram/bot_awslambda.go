@@ -27,6 +27,11 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return events.APIGatewayProxyResponse{Body: "Bad Request", StatusCode: 400}, nil
 	}
 
+	msg := update.Message
+	if msg == nil || msg.Text == "" || msg.From == nil {
+		return events.APIGatewayProxyResponse{Body: "Bad Request", StatusCode: 400}, nil
+	}
+
 	message := telegram.TabNewsTgBotUpdate{
 		Update: update,
 		Sender: sender,
